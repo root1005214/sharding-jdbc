@@ -19,10 +19,6 @@ package io.shardingsphere.core.routing.router.sharding;
 
 import com.google.common.base.Optional;
 import io.shardingsphere.core.constant.DatabaseType;
-import io.shardingsphere.core.event.ShardingEventBusInstance;
-import io.shardingsphere.core.event.parsing.ParsingEvent;
-import io.shardingsphere.core.event.parsing.ParsingFinishEvent;
-import io.shardingsphere.core.event.parsing.ParsingStartEvent;
 import io.shardingsphere.core.metadata.datasource.ShardingDataSourceMetaData;
 import io.shardingsphere.core.metadata.table.ShardingTableMetaData;
 import io.shardingsphere.core.optimizer.OptimizeEngineFactory;
@@ -56,6 +52,8 @@ import io.shardingsphere.core.routing.type.unicast.UnicastRoutingEngine;
 import io.shardingsphere.core.rule.ShardingRule;
 import io.shardingsphere.core.rule.TableRule;
 import io.shardingsphere.core.util.SQLLogger;
+import io.shardingsphere.spi.parsing.ParsingHook;
+import io.shardingsphere.spi.parsing.SPIParsingHook;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Collection;
@@ -65,7 +63,7 @@ import java.util.List;
 /**
  * Sharding router with parse.
  *
- * @author zhangiang
+ * @author zhangliang
  * @author maxiaoguang
  * @author panjuan
  */
@@ -84,21 +82,20 @@ public final class ParsingSQLRouter implements ShardingRouter {
     
     private final ShardingDataSourceMetaData shardingDataSourceMetaData;
     
+    private final ParsingHook parsingHook = new SPIParsingHook();
+    
     @Override
     public SQLStatement parse(final String logicSQL, final boolean useCache) {
-        ShardingEventBusInstance.getInstance().post(new ParsingStartEvent(logicSQL));
-        ParsingEvent finishEvent = new ParsingFinishEvent();
+        parsingHook.start(logicSQL);
         try {
-            SQLStatement sqlStatement = new SQLParsingEngine(databaseType, logicSQL, shardingRule, shardingTableMetaData).parse(useCache);
-            finishEvent.setExecuteSuccess();
-            return sqlStatement;
+            SQLStatement result = new SQLParsingEngine(databaseType, logicSQL, shardingRule, shardingTableMetaData).parse(useCache);
+            parsingHook.finishSuccess();
+            return result;
             // CHECKSTYLE:OFF
         } catch (final Exception ex) {
             // CHECKSTYLE:ON
-            finishEvent.setExecuteFailure(ex);
+            parsingHook.finishFailure(ex);
             throw ex;
-        } finally {
-            ShardingEventBusInstance.getInstance().post(finishEvent);
         }
     }
     
