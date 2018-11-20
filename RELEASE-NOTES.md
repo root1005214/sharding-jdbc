@@ -1,3 +1,26 @@
+## 3.0.1
+
+### API changes
+
+1. [ISSUE #1375](https://github.com/sharding-sphere/sharding-sphere/issues/1375) Adjust persist structure for orchestration's registry center
+
+### New Features
+
+#### Core
+
+1. [ISSUE #1412](https://github.com/sharding-sphere/sharding-sphere/issues/1412) Support broadcast table
+
+### Bug Fixes
+
+#### Core
+
+1. [ISSUE #1422](https://github.com/sharding-sphere/sharding-sphere/issues/1422) Exception occur when using defaultDataSourceName and defaultDatabaseStrategy at same time
+
+#### Sharding-Proxy
+
+1. [ISSUE #1403](https://github.com/sharding-sphere/sharding-sphere/issues/1403) master-slave mode exception when using PreparedStatement
+1. [ISSUE #1414](https://github.com/sharding-sphere/sharding-sphere/issues/1414) `SHOW CREATE TABLE tb_name` execution exception when configuring multiple logic schema
+
 ## 3.0.0
 
 ### Milestones
@@ -18,6 +41,7 @@
 1. [ISSUE #902](https://github.com/sharding-sphere/sharding-sphere/issues/902) Support XA transaction
 1. [ISSUE #916](https://github.com/sharding-sphere/sharding-sphere/issues/916) Support authorization
 1. [ISSUE #936](https://github.com/sharding-sphere/sharding-sphere/issues/936) Support registry center
+1. [ISSUE #1046](https://github.com/sharding-sphere/sharding-sphere/issues/1046) Support multiple logic databases
 
 ### Enhancements
 
@@ -29,6 +53,7 @@
 1. [ISSUE #773](https://github.com/sharding-sphere/sharding-sphere/issues/773) Support sharding and autoincrement key of INSERT without column names
 1. [ISSUE #935](https://github.com/sharding-sphere/sharding-sphere/issues/935) Use `YAML` instead of `JSON` to store configurations in registry center
 1. [ISSUE #1004](https://github.com/sharding-sphere/sharding-sphere/issues/1004) Properties can configure for Sharding and Master-slave independent
+1. [ISSUE #1205](https://github.com/sharding-sphere/sharding-sphere/issues/1205) Execute engine enhancement
 
 #### Sharding-JDBC
 
@@ -37,10 +62,18 @@
 1. [ISSUE #719](https://github.com/sharding-sphere/sharding-sphere/issues/719) Support inject key generator objects by spring namespace
 1. [ISSUE #720](https://github.com/sharding-sphere/sharding-sphere/issues/720) Support inject sharding algorithm objects by spring namespace
 
+#### Sharding-Opentracing
+
+1. [ISSUE #1172](https://github.com/sharding-sphere/sharding-sphere/issues/1172) Opentracing enhancement
+
 ### API changes
 
 1. [ISSUE #1153](https://github.com/sharding-sphere/sharding-sphere/issues/1153) Adjust the maven artifactId for Orchestration module
-1. [ISSUE #1203](https://github.com/sharding-sphere/sharding-sphere/issues/1203) Change Spring namespace xsd for Sharding + Master-slave configuration
+1. [ISSUE #1203](https://github.com/sharding-sphere/sharding-sphere/issues/1203) Adjust Spring namespace xsd for Sharding and Master-slave
+1. [ISSUE #1289](https://github.com/sharding-sphere/sharding-sphere/issues/1289) Adjust Hint API
+1. [ISSUE #1302](https://github.com/sharding-sphere/sharding-sphere/issues/1302) Refine package structure
+1. [ISSUE #1305](https://github.com/sharding-sphere/sharding-sphere/issues/1305) Deprecated and remove sharding-jdbc-transaction-parent module
+1. [ISSUE #1382](https://github.com/sharding-sphere/sharding-sphere/issues/1328) Remove type configuration in Orchestration module
 
 ### Bug Fixes
 
@@ -56,6 +89,7 @@
 1. [ISSUE #1015](https://github.com/sharding-sphere/sharding-sphere/issues/1015) Support SQL like `SELECT id, COUNT(*) FROM table GROUP BY 1,2`
 1. [ISSUE #1120](https://github.com/sharding-sphere/sharding-sphere/issues/1120) Derived columns of `GROUP BY / ORDER BY` appear in query result
 1. [ISSUE #1186](https://github.com/sharding-sphere/sharding-sphere/issues/1186) Dead lock may occur on MEMORY_STRICTLY mode when get connection on concurrency environment
+1. [ISSUE #1265](https://github.com/sharding-sphere/sharding-sphere/issues/1265) RoundRobinMasterSlaveLoadBalanceAlgorithm throw an ArrayIndexOutOfBoundsException when AtomicInteger overflow
 
 #### Sharding-JDBC
 

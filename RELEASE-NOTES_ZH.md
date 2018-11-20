@@ -1,3 +1,26 @@
+## 3.0.1
+
+### API调整
+
+1. [ISSUE #1375](https://github.com/sharding-sphere/sharding-sphere/issues/1375) 调整数据库治理模块的注册中心存储结构
+
+### 新功能
+
+#### Core
+
+1. [ISSUE #1412](https://github.com/sharding-sphere/sharding-sphere/issues/1412) 支持广播表
+
+### 缺陷修正
+
+#### Core
+
+1. [ISSUE #1422](https://github.com/sharding-sphere/sharding-sphere/issues/1422) 同时使用`defaultDataSourceName`和`defaultDatabaseStrategy`时异常
+
+#### Sharding-Proxy
+
+1. [ISSUE #1403](https://github.com/sharding-sphere/sharding-sphere/issues/1403) 读写分离模式时，使用`PreparedStatement`异常
+1. [ISSUE #1414](https://github.com/sharding-sphere/sharding-sphere/issues/1414) 多逻辑数据源配置时，`SHOW CREATE TABLE tb_name`语句执行异常
+
 ## 3.0.0
 
 ### 里程碑
@@ -18,7 +41,7 @@
 1. [ISSUE #902](https://github.com/sharding-sphere/sharding-sphere/issues/902) 支持XA事务
 1. [ISSUE #916](https://github.com/sharding-sphere/sharding-sphere/issues/916) 支持登录认证
 1. [ISSUE #936](https://github.com/sharding-sphere/sharding-sphere/issues/936) 支持注册中心进行治理
-
+1. [ISSUE #1046](https://github.com/sharding-sphere/sharding-sphere/issues/1046) 支持多逻辑数据库
 
 ### 功能提升
 
@@ -30,6 +53,7 @@
 1. [ISSUE #773](https://github.com/sharding-sphere/sharding-sphere/issues/773) 支持不包含列名的INSERT语句的分片与自增主键
 1. [ISSUE #935](https://github.com/sharding-sphere/sharding-sphere/issues/935) 取代`JSON`格式，而将`YAML`格式的配置文件存储在注册中心
 1. [ISSUE #1004](https://github.com/sharding-sphere/sharding-sphere/issues/1004) props属性可在分片和读写分离规则配置时独立使用
+1. [ISSUE #1205](https://github.com/sharding-sphere/sharding-sphere/issues/1205) 执行引擎提升
 
 #### Sharding-JDBC
 
@@ -38,11 +62,18 @@
 1. [ISSUE #719](https://github.com/sharding-sphere/sharding-sphere/issues/719) 支持Spring bean的方式在命名空间中注入自增序列生成器对象
 1. [ISSUE #720](https://github.com/sharding-sphere/sharding-sphere/issues/720) 支持Spring bean的方式在命名空间中注入分片算法对象
 
+#### Sharding-Opentracing
+
+1. [ISSUE #1172](https://github.com/sharding-sphere/sharding-sphere/issues/1172) Opentracing提升
+
 ### API调整
 
 1. [ISSUE #1153](https://github.com/sharding-sphere/sharding-sphere/issues/1153) 调整Orchestration模块Maven坐标
-1. [ISSUE #1203](https://github.com/sharding-sphere/sharding-sphere/issues/1203) 修改Sharding + Master-slave配置的Spring namespace xsd
-
+1. [ISSUE #1203](https://github.com/sharding-sphere/sharding-sphere/issues/1203) 调整数据分片和读写分离的Spring命名空间
+1. [ISSUE #1289](https://github.com/sharding-sphere/sharding-sphere/issues/1289) 调整Hint API
+1. [ISSUE #1302](https://github.com/sharding-sphere/sharding-sphere/issues/1302) 调整包结构
+1. [ISSUE #1305](https://github.com/sharding-sphere/sharding-sphere/issues/1305) 废弃并删除sharding-jdbc-transaction-parent模块
+1. [ISSUE #1382](https://github.com/sharding-sphere/sharding-sphere/issues/1328) 去除Orchestration模块中type的配置
 
 ### 缺陷修正
 
@@ -58,6 +89,7 @@
 1. [ISSUE #1015](https://github.com/sharding-sphere/sharding-sphere/issues/1015) 支持SQL `SELECT id, COUNT(*) FROM table GROUP BY 1,2`
 1. [ISSUE #1120](https://github.com/sharding-sphere/sharding-sphere/issues/1120) `GROUP BY / ORDER BY`产生的补列不应展现在查询结果中
 1. [ISSUE #1186](https://github.com/sharding-sphere/sharding-sphere/issues/1186) 在MEMORY_STRICTLY模式中，并发环境下可能产生死锁
+1. [ISSUE #1265](https://github.com/sharding-sphere/sharding-sphere/issues/1265) 当AtomicInteger溢出后，RoundRobinMasterSlaveLoadBalanceAlgorithm抛出ArrayIndexOutOfBoundsException异常
 
 #### Sharding-JDBC
 

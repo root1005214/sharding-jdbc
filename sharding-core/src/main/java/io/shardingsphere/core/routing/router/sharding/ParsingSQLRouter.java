@@ -19,10 +19,6 @@ package io.shardingsphere.core.routing.router.sharding;
 
 import com.google.common.base.Optional;
 import io.shardingsphere.core.constant.DatabaseType;
-import io.shardingsphere.core.event.ShardingEventBusInstance;
-import io.shardingsphere.core.event.parsing.ParsingEvent;
-import io.shardingsphere.core.event.parsing.ParsingFinishEvent;
-import io.shardingsphere.core.event.parsing.ParsingStartEvent;
 import io.shardingsphere.core.metadata.datasource.ShardingDataSourceMetaData;
 import io.shardingsphere.core.metadata.table.ShardingTableMetaData;
 import io.shardingsphere.core.optimizer.OptimizeEngineFactory;
@@ -50,12 +46,15 @@ import io.shardingsphere.core.routing.type.broadcast.DatabaseBroadcastRoutingEng
 import io.shardingsphere.core.routing.type.broadcast.InstanceBroadcastRoutingEngine;
 import io.shardingsphere.core.routing.type.broadcast.TableBroadcastRoutingEngine;
 import io.shardingsphere.core.routing.type.complex.ComplexRoutingEngine;
+import io.shardingsphere.core.routing.type.defaultdb.DefaultDatabaseRoutingEngine;
 import io.shardingsphere.core.routing.type.ignore.IgnoreRoutingEngine;
 import io.shardingsphere.core.routing.type.standard.StandardRoutingEngine;
 import io.shardingsphere.core.routing.type.unicast.UnicastRoutingEngine;
 import io.shardingsphere.core.rule.ShardingRule;
 import io.shardingsphere.core.rule.TableRule;
 import io.shardingsphere.core.util.SQLLogger;
+import io.shardingsphere.spi.parsing.ParsingHook;
+import io.shardingsphere.spi.parsing.SPIParsingHook;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Collection;
@@ -65,7 +64,7 @@ import java.util.List;
 /**
  * Sharding router with parse.
  *
- * @author zhangiang
+ * @author zhangliang
  * @author maxiaoguang
  * @author panjuan
  */
@@ -84,21 +83,20 @@ public final class ParsingSQLRouter implements ShardingRouter {
     
     private final ShardingDataSourceMetaData shardingDataSourceMetaData;
     
+    private final ParsingHook parsingHook = new SPIParsingHook();
+    
     @Override
     public SQLStatement parse(final String logicSQL, final boolean useCache) {
-        ShardingEventBusInstance.getInstance().post(new ParsingStartEvent(logicSQL));
-        ParsingEvent finishEvent = new ParsingFinishEvent();
+        parsingHook.start(logicSQL);
         try {
-            SQLStatement sqlStatement = new SQLParsingEngine(databaseType, logicSQL, shardingRule, shardingTableMetaData).parse(useCache);
-            finishEvent.setExecuteSuccess();
-            return sqlStatement;
+            SQLStatement result = new SQLParsingEngine(databaseType, logicSQL, shardingRule, shardingTableMetaData).parse(useCache);
+            parsingHook.finishSuccess();
+            return result;
             // CHECKSTYLE:OFF
         } catch (final Exception ex) {
             // CHECKSTYLE:ON
-            finishEvent.setExecuteFailure(ex);
+            parsingHook.finishFailure(ex);
             throw ex;
-        } finally {
-            ShardingEventBusInstance.getInstance().post(finishEvent);
         }
     }
     
@@ -134,21 +132,25 @@ public final class ParsingSQLRouter implements ShardingRouter {
         RoutingEngine routingEngine;
         if (sqlStatement instanceof UseStatement) {
             routingEngine = new IgnoreRoutingEngine();
+        } else if (shardingRule.isAllBroadcastTables(tableNames) && !(sqlStatement instanceof SelectStatement)) {
+            routingEngine = new DatabaseBroadcastRoutingEngine(shardingRule);
         } else if (sqlStatement instanceof DDLStatement || (sqlStatement instanceof DCLStatement && ((DCLStatement) sqlStatement).isGrantForSingleTable())) {
             routingEngine = new TableBroadcastRoutingEngine(shardingRule, sqlStatement);
         } else if (sqlStatement instanceof ShowDatabasesStatement || sqlStatement instanceof ShowTablesStatement) {
             routingEngine = new DatabaseBroadcastRoutingEngine(shardingRule);
         } else if (sqlStatement instanceof DCLStatement) {
             routingEngine = new InstanceBroadcastRoutingEngine(shardingRule, shardingDataSourceMetaData);
+        } else if (shardingRule.isAllInDefaultDataSource(tableNames)) {
+            routingEngine = new DefaultDatabaseRoutingEngine(shardingRule, tableNames);
         } else if (shardingConditions.isAlwaysFalse()) {
             routingEngine = new UnicastRoutingEngine(shardingRule, tableNames);
         } else if (sqlStatement instanceof DALStatement) {
             routingEngine = new UnicastRoutingEngine(shardingRule, tableNames);
-        } else if (tableNames.isEmpty() && sqlStatement instanceof SelectStatement) {
+        } else if (tableNames.isEmpty() && sqlStatement instanceof SelectStatement || shardingRule.isAllBroadcastTables(tableNames) && sqlStatement instanceof SelectStatement) {
             routingEngine = new UnicastRoutingEngine(shardingRule, tableNames);
         } else if (tableNames.isEmpty()) {
             routingEngine = new DatabaseBroadcastRoutingEngine(shardingRule);
-        } else if (1 == tableNames.size() || shardingRule.isAllBindingTables(tableNames) || shardingRule.isAllInDefaultDataSource(tableNames)) {
+        } else if (1 == tableNames.size() || shardingRule.isAllBindingTables(tableNames)) {
             routingEngine = new StandardRoutingEngine(shardingRule, tableNames.iterator().next(), shardingConditions);
         } else {
             // TODO config for cartesian set

@@ -19,6 +19,7 @@ package io.shardingsphere.core.executor;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Sharding group execute callback.
@@ -34,8 +35,10 @@ public interface ShardingGroupExecuteCallback<I, O> {
      * Execute callback.
      * 
      * @param inputs input values
+     * @param isTrunkThread is execution in trunk thread
+     * @param shardingExecuteDataMap sharding execute data map
      * @return execute result
      * @throws SQLException throw when execute failure
      */
-    Collection<O> execute(Collection<I> inputs) throws SQLException;
+    Collection<O> execute(Collection<I> inputs, boolean isTrunkThread, Map<String, Object> shardingExecuteDataMap) throws SQLException;
 }
